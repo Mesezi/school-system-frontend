@@ -3,7 +3,7 @@ import { loginUser } from '@/services/auth/loginService'
 import React, { useState } from 'react'
 import { io } from 'socket.io-client';
 // import { socket } from '../components/WebSocketProvider'
-const socket = io('http://localhost:3000'); // Replace with your server URL
+const socket = io( process.env.NEXT_PUBLIC_BACKEND_URL ?? ''); // Replace with your server URL
 
 const page = () => {
 

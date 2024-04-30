@@ -1,8 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import io from 'socket.io-client';
-
- const socket = io( process.env.NEXT_PUBLIC_BACKEND_URL ?? ''); // Replace with your server URL
+import { socket } from '../socket';
 
 const WebSocketProvider = ({
   children,
@@ -18,15 +17,14 @@ const WebSocketProvider = ({
       function onDisconnect() {
         setIsConnected(false);
       }
+
       socket.on('connect', onConnect);
       socket.on('disconnect', onDisconnect);
-      socket.on('joinRoom', ()=>console.log('joined room'));
-      socket.on('notification', (message)=>alert(message));
+      socket.on('notification', (message)=>console.log(message));
   
       return () => {
         socket.off('connect', onConnect);
         socket.off('disconnect', onDisconnect);
-        socket.off('joinRoom');
         socket.off('notification');
       };
 
@@ -45,7 +43,6 @@ const WebSocketProvider = ({
         socket.emit('hello', 'Hey');
         console.log('test')
       };
-      console.log(isConnected)
 
   return (
     <div>

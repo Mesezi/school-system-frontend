@@ -2,8 +2,7 @@
 import { loginUser } from '@/services/auth/loginService'
 import React, { useState } from 'react'
 import { io } from 'socket.io-client';
-// import { socket } from '../components/WebSocketProvider'
-const socket = io( process.env.NEXT_PUBLIC_BACKEND_URL ?? ''); // Replace with your server URL
+import { socket } from '../socket';
 
 const page = () => {
 
@@ -19,8 +18,10 @@ e.preventDefault()
 try{
     const res = await loginUser(details)
     if(res){
+        console.log('logged in')
         sessionStorage.setItem('schoolSystemUser', JSON.stringify(res))
-        socket.emit('joinRoom', {schoolId: res.user.schoolId});
+        socket.connect()
+        socket.emit('joinRoom', res?.user?.schoolId);
     }
 
 }

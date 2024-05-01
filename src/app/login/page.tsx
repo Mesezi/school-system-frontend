@@ -1,41 +1,39 @@
-'use client'
-import { loginUser } from '@/services/auth/loginService'
-import React, { useState } from 'react'
-import { io } from 'socket.io-client';
-// import { socket } from '../components/WebSocketProvider'
-const socket = io( process.env.NEXT_PUBLIC_BACKEND_URL ?? ''); // Replace with your server URL
+"use client";
+import { loginUser } from "@/services/auth/loginService";
+import React, { useState } from "react";
+import * as yup from "yup";
+import { socket } from "../socket";
+import { Form, Formik } from "formik";
+import FormInput from "../components/Form/FormInput";
+import FormPasswordInput from "../components/Form/FormPasswordInput";
+
+const loginFormSchema = yup.object({
+  email: yup.string().email().required("Enter email address"),
+  password: yup.string().required("Enter password"),
+});
+
+type loginTypes = yup.InferType<typeof loginFormSchema>;
 
 const page = () => {
-
-    const [details, setDetails] = useState({
-        email: '',
-        password: '',
-        type: 'superAdmin'
-    })
-
-const handleLogin = async (e: { preventDefault: () => void }) =>{
-e.preventDefault()
-
-try{
-    const res = await loginUser(details)
-    if(res){
-        sessionStorage.setItem('schoolSystemUser', JSON.stringify(res))
-        socket.emit('joinRoom', {schoolId: res.user.schoolId});
+  const handleLogin = async (values: loginTypes, setSubmitting: any) => {
+    try {
+      const res = await loginUser({...values, userType: 'superAdmin'});
+      if (res) {
+        console.log("logged in");
+        sessionStorage.setItem("schoolSystemUser", JSON.stringify(res));
+        socket.connect();
+        socket.emit("joinRoom", res?.user?.schoolId);
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setSubmitting(false);
     }
-
-}
-
-catch(err){
-    console.log(err)
-}
-
-
-}
-
+  };
 
   return (
     <div>
-      <form onSubmit={handleLogin} className='flex flex-col gap-3 bg-zinc-400 max-w-[400px] text-black'>
+      {/* <form onSubmit={handleLogin} className='flex flex-col gap-3 bg-zinc-400 max-w-[400px] text-black'>
 
     <input type="text" className='text-black'  onChange={(e)=>{
         setDetails({...details, email: e.target.value})
@@ -46,9 +44,59 @@ catch(err){
 
     <button>Submit</button>
 
-      </form>
-    </div>
-  )
-}
+      </form> */}
 
-export default page
+      <Formik
+        initialValues={{
+          email: "",
+          password: "",
+        }}
+        validationSchema={loginFormSchema}
+        onSubmit={(values, { setSubmitting }) => {
+          handleLogin(values, setSubmitting);
+        }}
+      >
+        {({ values, setFieldValue, isSubmitting }) => {
+          return (
+            <Form className="space-y-2 mt-4 max-w-[400px] p-4">
+              <section className="grid w-full gap-2">
+                <FormInput
+                  id="email"
+                  name="email"
+                  placeholder="Enter email"
+                  label="Email / username"
+                  onChange={(e) => {
+                    setFieldValue("email", e.target.value);
+                  }}
+                />
+
+                <FormPasswordInput
+                  id="password"
+                  name="password"
+                  placeholder="Enter password"
+                  label="Password"
+                  onChange={(e) => {
+                    setFieldValue("password", e.target.value);
+                  }}
+                />
+              </section>
+
+              <div className="flex justify-center mt-4">
+                <button
+                  disabled={isSubmitting}
+                  className="p-3 bg-green font-semibold text-white rounded-md w-full 
+                              md:max-w-[15rem] flex items-center justify-center h-12"
+                  type="submit"
+                >
+                  Submit
+                </button>
+              </div>
+            </Form>
+          );
+        }}
+      </Formik>
+    </div>
+  );
+};
+
+export default page;

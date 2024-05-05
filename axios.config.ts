@@ -1,15 +1,16 @@
-'use client'; // This directive ensures that this code runs only on the client-side in Next.js
+"use client"; // This directive ensures that this code runs only on the client-side in Next.js
 
-import Axios from 'axios';
+import Axios from "axios";
 
 const axios = Axios.create({
 	baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
 });
 
 // Check if window is defined before accessing sessionStorage
-const authUser = typeof window !== 'undefined' && sessionStorage.getItem("schoolSystemUser")
-    ? JSON.parse(sessionStorage.getItem("schoolSystemUser") ?? '')
-    : null;
+const authUser =
+	typeof window !== "undefined" && sessionStorage.getItem("schoolSystemUser")
+		? JSON.parse(sessionStorage.getItem("schoolSystemUser") ?? "")
+		: null;
 
 axios.interceptors.request.use(
 	(config) => {
@@ -17,7 +18,6 @@ axios.interceptors.request.use(
 		config.headers!["Content-Type"] = "application/json";
 		if (authUser) {
 			config.headers!["Authorization"] = `Bearer ${authUser?.accessToken}`;
-			config.headers!["x-school-id"] = `${authUser?.user.schoolId}`;
 		}
 
 		return config;

@@ -1,6 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { Field, ErrorMessage } from "formik";
-
 interface FieldProps {
 	id: string;
 	name: string;
@@ -13,8 +12,7 @@ interface FieldProps {
 	className?: string;
 	isDisabled?: boolean;
 }
-
-const FormInput: React.FC<FieldProps> = ({
+const FormTextArea: React.FC<FieldProps> = ({
 	id,
 	name,
 	label,
@@ -50,7 +48,7 @@ const FormInput: React.FC<FieldProps> = ({
 					form: any;
 					meta: any;
 				}) => (
-					<input
+					<textarea
 						{...field}
 						placeholder={placeholder}
 						className={` w-full h-[2.8rem] mt-1 px-3 border rounded-md
@@ -71,4 +69,4 @@ const FormInput: React.FC<FieldProps> = ({
 	);
 };
 
-export default FormInput;
+export default FormTextArea

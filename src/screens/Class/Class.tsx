@@ -1,11 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as yup from "yup";
 import { Form, Formik, Field } from "formik";
 import FormInput from "@/components/Form/FormInput";
 import FormSelect from "@/components/Form/FormSelect";
 import FormCheckBox from "@/components/Form/FormCheckBox";
-import { addClass, getAllClasses } from "@/services/classService";
+import { addClass, getAllClasses, deleteClass } from "@/services/classService";
+import { useRouter } from "next/navigation";
 
 const createClassFormSchema = yup.object({
 	userName: yup.string().required("Username cannot be empty"),
@@ -27,7 +28,26 @@ const createClassFormSchema = yup.object({
 type classTypes = yup.InferType<typeof createClassFormSchema>;
 
 function Class() {
-	const [allClasses, setAllClasses] = useState();
+	const router = useRouter();
+	const [allClasses, setAllClasses] = useState<any>();
+	useEffect(() => {
+		handleAllClasses();
+	}, []);
+	const handleAllClasses = async () => {
+		try {
+			const res = await getAllClasses();
+			if (res) {
+				// console.log(res);
+				setAllClasses(res.data);
+			}
+		} catch (err: any) {
+			const errorMessage = err?.message || "An error occurred";
+			alert(errorMessage);
+			setAllClasses([]);
+			console.log(err);
+		} finally {
+		}
+	};
 	const handleCreateClass = async (values: classTypes, setSubmitting: any) => {
 		console.log(values);
 		setSubmitting(false);
@@ -39,7 +59,8 @@ function Class() {
 			const res = await addClass({ ...values, subjects: filteredSubjects });
 			console.log(res);
 			if (res) {
-				alert("class successfully created!");
+				// alert("class successfully created!");
+				router.refresh();
 			}
 		} catch (err) {
 			console.log(err);
@@ -48,27 +69,67 @@ function Class() {
 		}
 	};
 
-	const handleAllClasses = async () => {
+	const handleDeleteClass = async (id: string) => {
 		try {
-			const res = await getAllClasses();
+			const res = await deleteClass(id);
 			if (res) {
-				console.log(res);
-				setAllClasses(res.data);
+				// alert("class successfully deleted!");        
+				router.refresh();
+			} else {
+				alert("unable to delete class atm, please try");
 			}
 		} catch (err) {
 			console.log(err);
 		} finally {
 		}
 	};
+
 	return (
 		<section className="px-4">
 			<p
 				onClick={handleAllClasses}
-				className="text-bold text-2xl border border-red-500 rounded-sm cursor-pointer"
+				className="text-bold text-2xl  rounded-sm cursor-pointer underline"
 			>
-				View all Class
+				All Classes
 			</p>
-			<p className="text-bold text-2xl mt-4">Create Class</p>
+			{allClasses?.length > 0 ? (
+				allClasses?.map((item: any) => (
+					<div
+						key={item.id}
+						className="flex flex-col gap-2 text-white border border-red-200"
+					>
+						<div className="flex items-center gap-4">
+							<p className="underline">CLASS ID / USERNAME:</p>
+							<p>{item.userName}</p>
+						</div>
+						<div className="flex items-center gap-4">
+							<p className="underline">TYPE:</p>
+							<p>{item.type}</p>
+						</div>
+						<div className="flex items-center gap-4">
+							<p className="underline">LEVEL:</p>
+							<p>{item.level}</p>
+						</div>
+						<div className="flex items-center gap-4">
+							<p className="underline">Class Name:</p>
+							<p>{item.name}</p>
+						</div>
+						<button
+							onClick={() => {
+								handleDeleteClass(item.id);
+							}}
+							className="border border-red-200 p-2 rounded-sm w-40 mx-auto"
+						>
+							Delete class
+						</button>
+					</div>
+				))
+			) : (
+				<p className="text-red-500">
+					ooops! it seems like you have not registered your classes!
+				</p>
+			)}
+			<p className="text-bold text-2xl mt-2 underline">Create Class</p>
 			<Formik
 				initialValues={{
 					userName: "",
@@ -84,7 +145,7 @@ function Class() {
 			>
 				{({ values, setFieldValue, isSubmitting }) => {
 					return (
-						<Form className="space-y-2 mt-4 max-w-[400px] p-4">
+						<Form className="space-y-2 max-w-[400px] p-4">
 							<section className="grid w-full gap-1">
 								<FormInput
 									id="userName"

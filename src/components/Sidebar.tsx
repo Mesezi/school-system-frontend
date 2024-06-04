@@ -15,6 +15,12 @@ function Sidebar() {
 			<Link href="/dashboard/information">
 				<p>School info</p>
 			</Link>
+			<Link href="/dashboard/subjects">
+				<p>School Subjects</p>
+			</Link>
+			<Link href="/dashboard/term-session">
+				<p>School Session/Term</p>
+			</Link>
 		</div>
 	);
 }

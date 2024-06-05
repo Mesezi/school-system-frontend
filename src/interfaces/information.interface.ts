@@ -14,6 +14,12 @@ export interface sessionSchema {
 	_id: string;
 }
 
+export interface subjectsSchema {
+	primary: string[];
+	juniorSecondary: string[];
+	seniorSecondary: string[];
+}
+
 export interface schoolInformationData {
 	schoolAddress: string;
 	schoolColor: string;
@@ -32,6 +38,6 @@ export interface AllinformationSchema {
 	schoolCalendar: any[];
 	schoolName: string;
 	schoolSessionAndTerm: sessionSchema;
-	schoolSubjects: any;
+	schoolSubjects: subjectsSchema;
 	updatedAt: string;
 }

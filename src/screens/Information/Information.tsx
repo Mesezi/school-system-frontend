@@ -2,28 +2,23 @@
 import React, { useState, useEffect } from "react";
 import { getSchoolInfo, editSchoolInfo } from "@/services/informationService";
 import { schoolInformationData } from "@/interfaces/information.interface";
-import { formatDateAndTime, formatDate } from "../../../utils";
 import { RiLoader4Fill } from "react-icons/ri";
+import { useAppSelector, useAppDispatch } from "@/lib/hook";
+import { setSchoolInformation } from "@/lib/slices/SchoolInformationSlice";
 
 function Information() {
+	const dispatch = useAppDispatch();
+	const data = useAppSelector((state) => state.information);
+	// console.log(data);
 	const [isloading, setIsloading] = useState<boolean>(false);
-	const [schoolData, setSchoolData] = useState<schoolInformationData>({
-		schoolAddress: "",
-		schoolColor: "",
-		schoolEmail: "",
-		schoolGradingSystem: { exam: 0, test1: 0, test2: 0 },
-		schoolLogo: "",
-		schoolShortName: "",
-	});
-	// const [formData, setFormData] = useState({});
-	useEffect(() => {
-		handleSchoolInfo();
-	}, []);
+	const [schoolData, setSchoolData] = useState<schoolInformationData>(
+		data.information.schoolInformation
+	);
+
 	const handleSchoolInfo = async () => {
 		try {
 			const res = await getSchoolInfo();
-			// console.log(res.data);
-			setSchoolData(res.data.schoolInformation);
+			dispatch(setSchoolInformation(res.data));
 		} catch (err: any) {
 			console.log(err);
 		} finally {

@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { RiLoader4Fill } from "react-icons/ri";
 import TimeTable from "@/components/TimeTable";
 import { updateTimeTable } from "@/services/classService";
+import { times } from "../../../utils";
 
 export interface subjectData {
 	title: string;
@@ -41,98 +42,6 @@ const initialFormState: TimeTableForm = {
 	startTime: "",
 	endTime: "",
 	subject: "",
-};
-
-const dummyData = {
-	Monday: [
-		{
-			startTime: "10am",
-			endTime: "11am",
-			subject: "Maths",
-		},
-		{
-			startTime: "11am",
-			endTime: "12pm",
-			subject: "Lunch",
-		},
-		{
-			startTime: "12pm",
-			endTime: "1pm",
-			subject: "English",
-		},
-	],
-
-	Tuesday: [
-		{
-			startTime: "10am",
-			endTime: "11am",
-			subject: "Maths",
-		},
-		{
-			startTime: "11am",
-			endTime: "12pm",
-			subject: "Lunch",
-		},
-		{
-			startTime: "12pm",
-			endTime: "1pm",
-			subject: "English",
-		},
-	],
-
-	Wednesday: [
-		{
-			startTime: "10am",
-			endTime: "11am",
-			subject: "Maths",
-		},
-		{
-			startTime: "11am",
-			endTime: "12pm",
-			subject: "Lunch",
-		},
-		{
-			startTime: "12pm",
-			endTime: "1pm",
-			subject: "English",
-		},
-	],
-
-	Thursday: [
-		{
-			startTime: "10am",
-			endTime: "11am",
-			subject: "Maths",
-		},
-		{
-			startTime: "11am",
-			endTime: "12pm",
-			subject: "Lunch",
-		},
-		{
-			startTime: "12pm",
-			endTime: "1pm",
-			subject: "English",
-		},
-	],
-
-	Friday: [
-		{
-			startTime: "10am",
-			endTime: "11am",
-			subject: "Maths",
-		},
-		{
-			startTime: "11am",
-			endTime: "12pm",
-			subject: "Lunch",
-		},
-		{
-			startTime: "12pm",
-			endTime: "1pm",
-			subject: "English",
-		},
-	],
 };
 
 const createClassFormSchema = yup.object({
@@ -292,7 +201,7 @@ function Class() {
 									e.preventDefault();
 									handleTimeTable(item.id, timeTableForm, item);
 								}}
-								className="p-2 border border-orange-500"
+								className="p-2 border border-orange-500 flex flex-col gap-3"
 							>
 								<div className="input_Wrapper text-white flex flex-col gap-1">
 									<label>Day</label>
@@ -314,29 +223,33 @@ function Class() {
 
 								<div className="input_Wrapper text-white flex flex-col gap-1">
 									<label>Start time</label>
-									<input
-										className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
-                 outline-none bg-white text-black"
-										type="text"
-										name="startTime"
-										placeholder="e.g(8am)"
+									<select
 										value={timeTableForm.startTime}
 										onChange={handleChange}
+										name="startTime"
 										required={true}
-									/>
+										className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
+                 outline-none bg-white text-black"
+									>
+										{times.map((time: string) => (
+											<option key={time}>{time}</option>
+										))}
+									</select>
 								</div>
 								<div className="input_Wrapper text-white flex flex-col gap-1">
 									<label>End Time</label>
-									<input
-										className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
-                 outline-none bg-white text-black"
-										type="text"
-										name="endTime"
-										placeholder="e.g(9am)"
+									<select
 										value={timeTableForm.endTime}
 										onChange={handleChange}
+										name="endTime"
 										required={true}
-									/>
+										className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
+                 outline-none bg-white text-black"
+									>
+										{times.map((time: string) => (
+											<option key={time}>{time}</option>
+										))}
+									</select>
 								</div>
 								<div className="input_Wrapper text-white flex flex-col gap-1">
 									<label> Subject</label>

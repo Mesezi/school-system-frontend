@@ -15,6 +15,7 @@ function Term() {
 	const [currentSession, setCurrentSession] = useState<sessionSchema>(
 		data?.information?.schoolSessionAndTerm || {}
 	);
+	// console.log(currentSession);
 	const handleSchoolInfo = async () => {
 		try {
 			const res = await getSchoolInfo();
@@ -28,7 +29,7 @@ function Term() {
 	const handleEdit = async (e: any) => {
 		e.preventDefault();
 		setIsloading(true);
-		console.log(currentSession);
+		// console.log(currentSession);
 		const { _id, ...sessionWithoutId } = currentSession;
 		try {
 			const res = await editTermDate({
@@ -57,7 +58,7 @@ function Term() {
                  outline-none bg-white text-black"
 					type="text"
 					name="session"
-					disabled={true}
+					// disabled={true}
 					value={currentSession?.session}
 					onChange={(e) =>
 						setCurrentSession({
@@ -70,12 +71,7 @@ function Term() {
 
 			<div className="input_Wrapper text-white flex flex-col gap-1">
 				<label>Current Term</label>
-				<input
-					className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
-                 outline-none bg-white text-black"
-					type="text"
-					name="term"
-					disabled={true}
+				<select
 					value={currentSession?.term}
 					onChange={(e) =>
 						setCurrentSession({
@@ -83,7 +79,15 @@ function Term() {
 							[e.target.name]: e.target.value,
 						})
 					}
-				/>
+					name="term"
+					required={true}
+					className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
+                 outline-none bg-white text-black"
+				>
+					<option value={"1"}>1st</option>
+					<option value={"2"}>2nd</option>
+					<option value={"3"}>3rd</option>
+				</select>
 			</div>
 
 			<div className="input_Wrapper text-white flex flex-col gap-1">

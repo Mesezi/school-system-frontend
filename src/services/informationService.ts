@@ -1,5 +1,5 @@
 import axios from "../../axios.config";
-import { schoolInformationData } from "@/interfaces/information.interface";
+import { schoolInformationData, sessionSchema } from "@/interfaces/information.interface";
 export const getSchoolInfo = async () => {
 	const response = await axios.get("api/school/details");
 	if (response.status === 200 || response.status === 201) {
@@ -23,3 +23,11 @@ export const editSubjects = async (data: any) => {
 	}
 	throw new Error(response.data.message);
 };
+
+export const editTermDate = async(data: sessionSchema)=>{
+	const response = await axios.post("api/school/sessionAndTerm", data);
+	if (response.status === 200 || response.status === 201) {
+		return response.data;
+	}
+	throw new Error(response.data.message);
+}

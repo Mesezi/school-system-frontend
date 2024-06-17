@@ -11,13 +11,14 @@ export interface sessionSchema {
 	session: string;
 	term: string;
 	termEndDate: string;
-	_id: string;
+	_id?: string;
 }
 
 export interface subjectsSchema {
 	primary: string[];
 	juniorSecondary: string[];
 	seniorSecondary: string[];
+	_id?: any;
 }
 
 export interface schoolInformationData {

@@ -12,7 +12,7 @@ function Information() {
 	// console.log(data);
 	const [isloading, setIsloading] = useState<boolean>(false);
 	const [schoolData, setSchoolData] = useState<schoolInformationData>(
-		data.information.schoolInformation
+		data?.information?.schoolInformation
 	);
 
 	const handleSchoolInfo = async () => {

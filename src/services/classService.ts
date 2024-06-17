@@ -17,10 +17,26 @@ export const getAllClasses = async () => {
 	throw new Error(response.data.message);
 };
 
-export const deleteClass = async (id: string)=>{
-  const response = await axios.delete(`api/class/delete/${id}`);
-  if (response.status === 200 || response.status === 201) {
-	return response.data;
-}
-throw new Error(response.data.message);
-}
+export const getClassInfo = async (id: string) => {
+	const response = await axios.get(`api/class/${id}`);
+	if (response.status === 200 || response.status === 201) {
+		return response.data;
+	}
+	throw new Error(response.data.message);
+};
+
+export const updateTimeTable = async (id: string, data: any) => {
+	const response = await axios.post(`api/class/update-timetable/${id}`, data);
+	if (response.status === 200 || response.status === 201) {
+		return response.data;
+	}
+	throw new Error(response.data.message);
+};
+
+export const deleteClass = async (id: string) => {
+	const response = await axios.delete(`api/class/delete/${id}`);
+	if (response.status === 200 || response.status === 201) {
+		return response.data;
+	}
+	throw new Error(response.data.message);
+};

@@ -5,19 +5,22 @@ import { RiLoader4Fill } from "react-icons/ri";
 import { useAppSelector, useAppDispatch } from "@/lib/hook";
 import { setSchoolInformation } from "@/lib/slices/SchoolInformationSlice";
 import { subjectsSchema } from "@/interfaces/information.interface";
+import { useRouter } from "next/navigation";
 
 function Subjects() {
+	const router = useRouter();
 	const dispatch = useAppDispatch();
 	const data = useAppSelector(
 		(state: { information: any }) => state.information
 	);
+
 	const [isloading, setIsloading] = useState<boolean>(false);
 	const [schoolSubjects, setSchoolSubjects] = useState<subjectsSchema>(
-		data.information.schoolSubjects
+		data?.information?.schoolSubjects || {}
 	);
 	const [newSubject, setNewSubject] = useState("");
 	const [category, setCategory] = useState("primary");
-	console.log(schoolSubjects);
+
 	const handleSchoolInfo = async () => {
 		try {
 			const res = await getSchoolInfo();
@@ -38,48 +41,85 @@ function Subjects() {
 				],
 			}));
 		}
-		saveSubjects();
+		setNewSubject("");
 	};
 
-	const saveSubjects = async () => {
+	const handleEditSubject = (
+		e: React.ChangeEvent<HTMLInputElement>,
+		index: number,
+		category: string
+	) => {
+		const updatedSubjects = [
+			...schoolSubjects[category as keyof subjectsSchema],
+		];
+		updatedSubjects[index] = e.target.value;
+		setSchoolSubjects({
+			...schoolSubjects,
+			[category]: updatedSubjects,
+		});
+		console.log(schoolSubjects);
+	};
+
+	const saveSubjects = async (data: subjectsSchema) => {
 		setIsloading(true);
 		try {
-			const res = await editSubjects(schoolSubjects);
+			const { _id, ...subjectsWithoutId } = data;
+			const res = await editSubjects(subjectsWithoutId);
+			handleSchoolInfo();
 			console.log(res);
 			setIsloading(false);
-			alert(res.message);
-			handleSchoolInfo();
-			setNewSubject("");
 		} catch (err: any) {
 			setIsloading(false);
 			console.log(err);
+			router.refresh();
 		} finally {
 			setIsloading(false);
 		}
 	};
+
 	return (
 		<form
 			className="p-2 flex flex-col gap-4"
 			onSubmit={(e) => e.preventDefault()}
 		>
 			<p className="underline text-2xl">Primary</p>
-			{schoolSubjects.primary.length > 0 ? (
-				schoolSubjects.primary.map((item, index) => <p key={index}>{item}</p>)
+			{schoolSubjects.primary?.length > 0 ? (
+				schoolSubjects.primary.map((item, index) => (
+					<input
+						key={index}
+						type="text"
+						value={item}
+						onChange={(e) => handleEditSubject(e, index, "primary")}
+						className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md outline-none bg-white text-black"
+					/>
+				))
 			) : (
 				<p>No registered subject for Primary School</p>
 			)}
 			<p className="underline text-2xl">Junior Secondary</p>
-			{schoolSubjects.juniorSecondary.length > 0 ? (
+			{schoolSubjects.juniorSecondary?.length > 0 ? (
 				schoolSubjects.juniorSecondary.map((item, index) => (
-					<p key={index}>{item}</p>
+					<input
+						key={index}
+						type="text"
+						value={item}
+						onChange={(e) => handleEditSubject(e, index, "juniorSecondary")}
+						className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md outline-none bg-white text-black"
+					/>
 				))
 			) : (
 				<p>No registered subject for Junior Secondary School</p>
 			)}
 			<p className="underline text-2xl">Senior Secondary</p>
-			{schoolSubjects.seniorSecondary.length > 0 ? (
+			{schoolSubjects.seniorSecondary?.length > 0 ? (
 				schoolSubjects.seniorSecondary.map((item, index) => (
-					<p key={index}>{item}</p>
+					<input
+						key={index}
+						type="text"
+						value={item}
+						onChange={(e) => handleEditSubject(e, index, "seniorSecondary")}
+						className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md outline-none bg-white text-black"
+					/>
 				))
 			) : (
 				<p>No registered subject for Senior Secondary School</p>
@@ -87,8 +127,7 @@ function Subjects() {
 			<div className="flex flex-col gap-4 text-black">
 				<h2>Add New Subject</h2>
 				<input
-					className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
-        outline-none bg-white text-black"
+					className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md outline-none bg-white text-black"
 					type="text"
 					value={newSubject}
 					onChange={(e) => setNewSubject(e.target.value)}
@@ -96,8 +135,7 @@ function Subjects() {
 					required={true}
 				/>
 				<select
-					className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
-        outline-none bg-white text-black"
+					className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md outline-none bg-white text-black"
 					value={category}
 					onChange={(e) => setCategory(e.target.value)}
 					required={true}
@@ -115,6 +153,20 @@ function Subjects() {
 						<RiLoader4Fill className="h-[2rem] w-[2rem] text-green animate-spin text-black" />
 					) : (
 						"Add Subject"
+					)}
+				</button>
+			</div>
+			<div className="flex flex-col gap-4 text-black">
+				<h2>Save Changes</h2>
+				<button
+					type="button"
+					className="p-2 border border-red-600 text-black bg-white rounded-lg w-1/2 flex items-center justify-center"
+					onClick={() => saveSubjects(schoolSubjects)}
+				>
+					{isloading ? (
+						<RiLoader4Fill className="h-[2rem] w-[2rem] text-green animate-spin text-black" />
+					) : (
+						"Save Changes"
 					)}
 				</button>
 			</div>

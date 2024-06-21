@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import * as yup from "yup";
-import { Form, Formik, Field } from "formik";
+import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import FormInput from "@/components/Form/FormInput";
 import FormSelect from "@/components/Form/FormSelect";
 import FormCheckBox from "@/components/Form/FormCheckBox";
@@ -11,12 +11,16 @@ import { RiLoader4Fill } from "react-icons/ri";
 import TimeTable from "@/components/TimeTable";
 import { updateTimeTable } from "@/services/classService";
 import { times } from "../../../utils";
+import { classSubjectData, classSchema } from "@/interfaces/classInterface";
+import Link from "next/link";
 
-export interface subjectData {
-	title: string;
-	description: string;
-	schemeOfWork: string;
-}
+//pseudocode to create subjects
+//a form showing name, description, scheme of work(o i am thinking i would have form, when it gets to scheme of work, i can many scheme of works, you know how you can add multiple qualifications when filling a job form or applying for something. i think somethink like this works, so i would have like a plus sign for adding extra forms)
+// -- view more btn  to allow students, you can class info here
+// -- use chatgpt reference
+// --send applications
+//no situation that calls for you to be scared
+//menu needs to add id and change subject to subjectDescription
 
 export interface classData {
 	id: string;
@@ -25,7 +29,7 @@ export interface classData {
 	level: string;
 	name: string;
 	schoolId: string;
-	subjects: subjectData[];
+	subjects: classSubjectData[];
 	classMessages: string[];
 	timetable: any;
 }
@@ -55,11 +59,23 @@ const createClassFormSchema = yup.object({
 		.required("Select a valid class"),
 	level: yup.string().required("Select level"),
 	name: yup.string().required("Class name is required"),
-	subjects: yup
-		.array()
-		.of(yup.string())
-		.min(1, "At least one subject must be selected")
-		.required("At least one subject must be selected"),
+	subjects: yup.array().of(
+		yup.object().shape({
+			title: yup.string().required("Required"),
+			subjectDescription: yup.string().required("Required"),
+			schemeOfWork: yup.array().of(
+				yup.object().shape({
+					week: yup
+						.number()
+						.required("Required")
+						.positive("Must be a positive number")
+						.integer(),
+					topic: yup.string().required("Required"),
+					description: yup.string().required("Required"),
+				})
+			),
+		})
+	),
 });
 type classTypes = yup.InferType<typeof createClassFormSchema>;
 
@@ -116,7 +132,7 @@ function Class() {
 		try {
 			const res = await getAllClasses();
 			setAllClasses(res.data);
-			// console.log(res.data);
+			console.log(res.data);
 		} catch (err: any) {
 			const errorMessage = err?.message || "An error occurred";
 			alert(errorMessage);
@@ -125,15 +141,14 @@ function Class() {
 		} finally {
 		}
 	};
-	const handleCreateClass = async (values: classTypes, setSubmitting: any) => {
-		// setSubmitting(false);
+	const handleCreateClass = async (values: classSchema, setSubmitting: any) => {
+		setSubmitting(true);
+		console.log(values);
+		console.log("submitted");
+		setSubmitting(false);
 		try {
 			setSubmitting(false);
-			const filteredSubjects = values.subjects.filter(
-				(subject) => subject !== undefined
-			) as string[];
-			const res = await addClass({ ...values, subjects: filteredSubjects });
-
+			const res = await addClass(values);
 			router.refresh();
 		} catch (err) {
 			console.log(err);
@@ -185,8 +200,8 @@ function Class() {
 						</div>
 						<div className="flex items-center gap-4">
 							<p className="underline">Class Subjects:</p>
-							{item?.subjects.map((subject: subjectData) => (
-								<p key={subject.title}>{subject.title},</p>
+							{item?.subjects.map((subject: classSubjectData, index) => (
+								<p key={index}>{subject.title},</p>
 							))}
 						</div>
 						<div className="flex items-center gap-4">
@@ -195,7 +210,7 @@ function Class() {
 						{/* time table component */}
 						<TimeTable data={item.timetable} />
 						{/* //time Table form, change to a component */}
-						{showTimeTable && (
+						{/* {showTimeTable && (
 							<form
 								onSubmit={(e) => {
 									e.preventDefault();
@@ -292,7 +307,7 @@ function Class() {
 							>
 								Edit Timetable
 							</button>
-						)}
+						)} */}
 
 						<button
 							type="button"
@@ -302,6 +317,13 @@ function Class() {
 							className="border border-red-500 p-2 rounded-sm w-40 mx-auto bg-red-500"
 						>
 							Delete class
+						</button>
+
+						<button
+							type="button"
+							className="border border-orange-500 p-2 rounded-sm w-40 mx-auto bg-orange-500"
+						>
+							<Link href={`/dashboard/class/${item.id}`}>View More</Link>
 						</button>
 					</div>
 				))
@@ -320,7 +342,13 @@ function Class() {
 							type: "",
 							level: "",
 							name: "",
-							subjects: [],
+							subjects: [
+								{
+									title: "",
+									subjectDescription: "",
+									schemeOfWork: [{ week: "", topic: "", description: "" }],
+								},
+							],
 						}}
 						validationSchema={createClassFormSchema}
 						onSubmit={(values: any, { setSubmitting }) =>
@@ -369,44 +397,197 @@ function Class() {
 											}}
 										/>
 
-										<FormCheckBox label="Subjects" name="subjects">
-											<label>
-												<Field type="checkbox" name="subjects" value="Maths" />
-												Maths
-											</label>
-											<label>
-												<Field
-													type="checkbox"
-													name="subjects"
-													value="English"
-												/>
-												English
-											</label>
-											<label>
-												<Field
-													type="checkbox"
-													name="subjects"
-													value="Science"
-												/>
-												Science
-											</label>
-										</FormCheckBox>
+										<FieldArray name="subjects">
+											{({ insert, remove, push }) => (
+												<div className="">
+													<h3 className="text-lg text-orange-500 underline">
+														Subjects
+													</h3>
+													{values.subjects.length > 0 &&
+														values.subjects.map((subject: any, index: any) => (
+															<div
+																key={index}
+																className="flex gap-4 flex-col border-blue-500 border p-4 my-2"
+															>
+																<div className="flex flex-col">
+																	<label htmlFor={`subjects.${index}.title`}>
+																		Subject Name
+																	</label>
+																	<Field
+																		className="w-full h-[2.8rem] mt-1 px-3 border rounded-md
+					placeholder:text-[#A1A7AD] outline-none bg-white text-black"
+																		name={`subjects.${index}.title`}
+																	/>
+																	<ErrorMessage
+																		className="text-red-500"
+																		name={`subjects.${index}.title`}
+																		component="div"
+																	/>
+																</div>
+
+																<div className="flex flex-col">
+																	<label
+																		htmlFor={`subjects.${index}.subjectDescription`}
+																	>
+																		Subject Description
+																	</label>
+																	<Field
+																		className="w-full h-[2.8rem] mt-1 px-3 border rounded-md
+					placeholder:text-[#A1A7AD] outline-none bg-white text-black"
+																		name={`subjects.${index}.subjectDescription`}
+																	/>
+																	<ErrorMessage
+																		className="text-red-500"
+																		name={`subjects.${index}.subjectDescription`}
+																		component="div"
+																	/>
+																</div>
+
+																<FieldArray
+																	name={`subjects.${index}.schemeOfWork`}
+																>
+																	{({
+																		insert: insertWeek,
+																		remove: removeWeek,
+																		push: pushWeek,
+																	}) => (
+																		<div className="">
+																			<h4 className="underline text-orange-500">
+																				Scheme of Work
+																			</h4>
+																			{subject.schemeOfWork.length > 0 &&
+																				subject.schemeOfWork.map(
+																					(week: any, weekIndex: any) => (
+																						<div
+																							key={weekIndex}
+																							className="flex flex-col gap-4 border-orange-500 border p-2 m-2"
+																						>
+																							<div className="flex flex-col">
+																								<label
+																									htmlFor={`subjects.${index}.schemeOfWork.${weekIndex}.week`}
+																								>
+																									Week No
+																								</label>
+																								<Field
+																									className="w-full h-[2.8rem] mt-1 px-3 border rounded-md
+																								placeholder:text-[#A1A7AD] outline-none bg-white text-black"
+																									name={`subjects.${index}.schemeOfWork.${weekIndex}.week`}
+																									type="number"
+																								/>
+																								<ErrorMessage
+																									name={`subjects.${index}.schemeOfWork.${weekIndex}.week`}
+																									component="div"
+																									className="text-red-500"
+																								/>
+																							</div>
+
+																							<div className="flex flex-col">
+																								<label
+																									htmlFor={`subjects.${index}.schemeOfWork.${weekIndex}.topic`}
+																								>
+																									Topic Title
+																								</label>
+																								<Field
+																									className="w-full h-[2.8rem] mt-1 px-3 border rounded-md
+																								placeholder:text-[#A1A7AD] outline-none bg-white text-black"
+																									name={`subjects.${index}.schemeOfWork.${weekIndex}.topic`}
+																								/>
+																								<ErrorMessage
+																									name={`subjects.${index}.schemeOfWork.${weekIndex}.topic`}
+																									component="div"
+																									className="text-red-500"
+																								/>
+																							</div>
+
+																							<div className="flex flex-col">
+																								<label
+																									htmlFor={`subjects.${index}.schemeOfWork.${weekIndex}.description`}
+																								>
+																									Topic Description
+																								</label>
+																								<Field
+																									className="w-full h-[2.8rem] mt-1 px-3 border rounded-md
+																								placeholder:text-[#A1A7AD] outline-none bg-white text-black"
+																									name={`subjects.${index}.schemeOfWork.${weekIndex}.description`}
+																								/>
+																								<ErrorMessage
+																									name={`subjects.${index}.schemeOfWork.${weekIndex}.description`}
+																									component="div"
+																									className="text-red-500"
+																								/>
+																							</div>
+
+																							<button
+																								className="bg-red-500 p-1 rounded"
+																								type="button"
+																								onClick={() =>
+																									removeWeek(weekIndex)
+																								}
+																							>
+																								Remove Week
+																							</button>
+																						</div>
+																					)
+																				)}
+																			<button
+																				className=" bg-orange-500 p-1 mt-2 rounded w-full"
+																				type="button"
+																				onClick={() =>
+																					pushWeek({
+																						week: "",
+																						topic: "",
+																						description: "",
+																					})
+																				}
+																			>
+																				Add Week
+																			</button>
+																		</div>
+																	)}
+																</FieldArray>
+
+																<button
+																	className="bg-red-500 p-1 mt-2 rounde"
+																	type="button"
+																	onClick={() => remove(index)}
+																>
+																	Remove Subject
+																</button>
+															</div>
+														))}
+													<button
+														className="p-1 bg-blue-500 rounded mt-2 w-full"
+														type="button"
+														onClick={() =>
+															push({
+																title: "",
+																subjectDescription: "",
+																schemeOfWork: [
+																	{ week: "", topic: "", description: "" },
+																],
+															})
+														}
+													>
+														Add Subject
+													</button>
+												</div>
+											)}
+										</FieldArray>
 									</section>
 
-									<div className="flex justify-center mt-4">
-										<button
-											// disabled={isSubmitting}
-											className="p-3 bg-green font-semibold text-white rounded-md w-full 
-                              md:max-w-[15rem] flex items-center justify-center h-12 border border-red-500 rouned-sm cursor-pointer"
-											type="submit"
-										>
-											{isSubmitting ? (
-												<RiLoader4Fill className="h-[2rem] w-[2rem]  animate-spin text-red-500" />
-											) : (
-												"Create Class"
-											)}
-										</button>
-									</div>
+									{/* <div className="flex justify-center mt-4"> */}
+									<button
+										type="submit"
+										className="p-3 bg-green font-semibold text-white rounded-md w-full 
+                              md:max-w-[15rem] flex items-center justify-center h-12 bg-orange-500 rouned-sm cursor-pointer mt-2"
+									>
+										{isSubmitting ? (
+											<RiLoader4Fill className="h-[2rem] w-[2rem]  animate-spin text-red-500" />
+										) : (
+											"Create Class"
+										)}
+									</button>
+									{/* </div> */}
 								</Form>
 							);
 						}}

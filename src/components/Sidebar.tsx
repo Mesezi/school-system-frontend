@@ -21,6 +21,9 @@ function Sidebar() {
 			<Link href="/dashboard/term-session">
 				<p>School Session/Term</p>
 			</Link>
+			<Link href="/dashboard/students">
+				<p>Students</p>
+			</Link>
 		</div>
 	);
 }

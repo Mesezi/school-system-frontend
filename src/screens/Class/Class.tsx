@@ -8,15 +8,11 @@ import FormCheckBox from "@/components/Form/FormCheckBox";
 import { addClass, getAllClasses, deleteClass } from "@/services/classService";
 import { useRouter } from "next/navigation";
 import { RiLoader4Fill } from "react-icons/ri";
-import TimeTable from "@/components/TimeTable";
 import { updateTimeTable } from "@/services/classService";
 import { times } from "../../../utils";
 import { classSubjectData, classSchema } from "@/interfaces/classInterface";
 import Link from "next/link";
 
-//pseudocode to create subjects
-//a form showing name, description, scheme of work(o i am thinking i would have form, when it gets to scheme of work, i can many scheme of works, you know how you can add multiple qualifications when filling a job form or applying for something. i think somethink like this works, so i would have like a plus sign for adding extra forms)
-// -- view more btn  to allow students, you can class info here
 // -- use chatgpt reference
 // --send applications
 //no situation that calls for you to be scared
@@ -207,107 +203,6 @@ function Class() {
 						<div className="flex items-center gap-4">
 							<p className="underline">Class TimeTable:</p>
 						</div>
-						{/* time table component */}
-						<TimeTable data={item.timetable} />
-						{/* //time Table form, change to a component */}
-						{/* {showTimeTable && (
-							<form
-								onSubmit={(e) => {
-									e.preventDefault();
-									handleTimeTable(item.id, timeTableForm, item);
-								}}
-								className="p-2 border border-orange-500 flex flex-col gap-3"
-							>
-								<div className="input_Wrapper text-white flex flex-col gap-1">
-									<label>Day</label>
-									<select
-										value={timeTableForm.day}
-										onChange={handleChange}
-										name="day"
-										required={true}
-										className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
-                 outline-none bg-white text-black"
-									>
-										<option value={"Monday"}>Monday</option>
-										<option value={"Tuesday"}>Tuesday</option>
-										<option value={"Wednesday"}>Wednesday</option>
-										<option value={"Thursday"}>Thursday</option>
-										<option value={"Friday"}>Friday</option>
-									</select>
-								</div>
-
-								<div className="input_Wrapper text-white flex flex-col gap-1">
-									<label>Start time</label>
-									<select
-										value={timeTableForm.startTime}
-										onChange={handleChange}
-										name="startTime"
-										required={true}
-										className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
-                 outline-none bg-white text-black"
-									>
-										{times.map((time: string) => (
-											<option key={time}>{time}</option>
-										))}
-									</select>
-								</div>
-								<div className="input_Wrapper text-white flex flex-col gap-1">
-									<label>End Time</label>
-									<select
-										value={timeTableForm.endTime}
-										onChange={handleChange}
-										name="endTime"
-										required={true}
-										className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
-                 outline-none bg-white text-black"
-									>
-										{times.map((time: string) => (
-											<option key={time}>{time}</option>
-										))}
-									</select>
-								</div>
-								<div className="input_Wrapper text-white flex flex-col gap-1">
-									<label> Subject</label>
-									<input
-										className="w-1/2 h-[2.8rem] mt-1 px-3 border rounded-md
-                 outline-none bg-white text-black"
-										type="text"
-										name="subject"
-										value={timeTableForm.subject}
-										onChange={handleChange}
-										required={true}
-									/>
-								</div>
-								<div className="flex  items-center">
-									<button
-										type="submit"
-										className="border border-orange-500 p-2 rounded-sm w-40 mx-auto bg-orange-500 mt-4"
-									>
-										Save Timetable
-									</button>
-									<button
-										onClick={() => {
-											setShowTimeTable(false);
-										}}
-										type="button"
-										className="border border-orange-500 p-2 rounded-sm w-40 mx-auto bg-orange-500 mt-4"
-									>
-										Close form
-									</button>
-								</div>
-							</form>
-						)}
-						{!showTimeTable && (
-							<button
-								onClick={() => {
-									setShowTimeTable(true);
-								}}
-								type="button"
-								className="border border-orange-500 p-2 rounded-sm w-40 mx-auto bg-orange-500"
-							>
-								Edit Timetable
-							</button>
-						)} */}
 
 						<button
 							type="button"

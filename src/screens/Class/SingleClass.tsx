@@ -1,13 +1,20 @@
 "use client";
 import React, { useState, useEffect, ChangeEvent } from "react";
 import Link from "next/link";
-import { getClassInfo, updateTimeTable } from "@/services/classService";
+import {
+	getClassInfo,
+	updateTimeTable,
+	updateClassSubject,
+	deleteClassSubject,
+} from "@/services/classService";
 import { useParams, useRouter } from "next/navigation";
 import * as yup from "yup";
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
-import { classSubjectData } from "@/interfaces/classInterface";
+import {
+	classSubjectData,
+	SchemeOfWorkItem,
+} from "@/interfaces/classInterface";
 import { classData } from "./Class";
-import { resolve } from "path/win32";
 
 interface TimetableItem {
 	startTime: string;
@@ -34,6 +41,7 @@ function SingleClass() {
 	});
 	const [classTimetable, setClassTimetable] = useState<TimetableData>({});
 	const [classStudents, setClassStudents] = useState<any[]>([]);
+	const [classSubjects, setClassSubjects] = useState<classSubjectData[]>([]);
 	useEffect(() => {
 		handleClassInfo();
 	}, []);
@@ -44,6 +52,7 @@ function SingleClass() {
 			// console.log(res.data.classInformation.timetable);
 			setClassStudents(res.data.students);
 			setClassTimetable(res.data.classInformation.timetable);
+			setClassSubjects(res.data.classInformation.subjects);
 		} catch (err: any) {
 			const errorMessage = err?.message || "An error occurred";
 			alert(errorMessage);
@@ -189,6 +198,66 @@ function SingleClass() {
 			</div>
 		</div>
 	);
+
+	const handleSchemeChange = (
+		e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+		subjectId: string,
+		weekIndex: number,
+		field: keyof SchemeOfWorkItem
+	) => {
+		const updatedSubjects = classSubjects.map((subject) => {
+			if (subject._id === subjectId) {
+				const updatedSchemeOfWork = subject.schemeOfWork.map((item, index) => {
+					if (index === weekIndex) {
+						return { ...item, [field]: e.target.value };
+					}
+					return item;
+				});
+				return { ...subject, schemeOfWork: updatedSchemeOfWork };
+			}
+			return subject;
+		});
+		setClassSubjects(updatedSubjects);
+	};
+
+	const handleSubjectChange = (
+		e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+		subjectId: string,
+		field: keyof classSubjectData
+	) => {
+		const updatedSubjects = classSubjects.map((subject) => {
+			if (subject._id === subjectId) {
+				return { ...subject, [field]: e.target.value };
+			}
+			return subject;
+		});
+		setClassSubjects(updatedSubjects);
+	};
+
+	const handleSaveSubject = async (subjectId: string) => {
+		const subjectToSave = classSubjects.find(
+			(subject) => subject._id === subjectId
+		);
+		if (subjectToSave) {
+			// Perform your API call to save the subject
+			console.log("Saving subject:", subjectToSave);
+			try {
+				const res = await updateClassSubject(params.id, subjectId);
+                console.log(res)
+                alert("subject successfully updated")
+                router.refresh()
+			} catch (err) {
+                
+            }
+		}
+	};
+
+	const handleDeleteSubject = (subjectId: string) => {
+		const updatedSubjects = classSubjects.filter(
+			(subject) => subject._id !== subjectId
+		);
+		setClassSubjects(updatedSubjects);
+	};
 	return (
 		<section className="px-4">
 			<form className="flex flex-col gap-4">
@@ -274,6 +343,102 @@ function SingleClass() {
 				>
 					Submit
 				</button>
+			</div>
+
+			<div>
+				<p className="text-2xl underline mt-4">Class Subjects</p>
+				<div className="">
+					<h1 className="text-orange-500 underline">Subjects</h1>
+					{classSubjects.map((subject) => (
+						<div key={subject._id} className="mb-5 border p-2.5">
+							<div className="flex flex-col gap-0.5">
+								<label htmlFor="title">Subject Title</label>
+								<input
+									id="title"
+									className="w-1/4 h-[2.8rem] mt-1 px-3 border rounded-md
+                                   placeholder:text-[#A1A7AD] outline-none bg-white text-black"
+									type="text"
+									value={subject.title}
+									onChange={(e) => handleSubjectChange(e, subject._id, "title")}
+									placeholder="Title"
+								/>
+							</div>
+
+							<div className="flex flex-col gap-0.5">
+								<label htmlFor="subjectDescription">Subject description</label>
+								<textarea
+									id="subjectDescription"
+									className="w-1/4 h-[2.8rem] mt-1 px-3 border rounded-md
+                                 placeholder:text-[#A1A7AD] outline-none bg-white text-black"
+									value={subject.subjectDescription}
+									onChange={(e) =>
+										handleSubjectChange(e, subject._id, "subjectDescription")
+									}
+									placeholder="Subject Description"
+								/>
+							</div>
+
+							<h3 className="text-orange-500 underline">Scheme of Work</h3>
+							{subject.schemeOfWork.map((item, index) => (
+								<div key={index} className="mb-2.5 border border-orange-500">
+									<div className="flex flex-col gap-0.5">
+										<label htmlFor="week">Week:</label>
+										<input
+											id="week"
+											className="w-1/4 h-[2.8rem] mt-1 px-3 border rounded-md
+                                            placeholder:text-[#A1A7AD] outline-none bg-white text-black"
+											type="number"
+											value={item.week}
+											onChange={(e) =>
+												handleSchemeChange(e, subject._id, index, "week")
+											}
+											placeholder="Week"
+										/>
+									</div>
+									<div className="flex flex-col gap-0.5">
+										<label htmlFor="topic">Topic:</label>
+										<input
+											id="topic"
+											className="w-1/4 h-[2.8rem] mt-1 px-3 border rounded-md
+                                        placeholder:text-[#A1A7AD] outline-none bg-white text-black"
+											type="text"
+											value={item.topic}
+											onChange={(e) =>
+												handleSchemeChange(e, subject._id, index, "topic")
+											}
+											placeholder="Topic"
+										/>
+									</div>
+									<div className="flex flex-col gap-0.5">
+										<label htmlFor="description">Description:</label>
+										<textarea
+											id="description"
+											className="w-1/4 h-[2.8rem] mt-1 px-3 border rounded-md
+                                        placeholder:text-[#A1A7AD] outline-none bg-white text-black"
+											value={item.description}
+											onChange={(e) =>
+												handleSchemeChange(e, subject._id, index, "description")
+											}
+											placeholder="Description"
+										/>
+									</div>
+								</div>
+							))}
+							<button
+								className="p-2 bg-blue-500 rounded mr-4"
+								onClick={() => handleSaveSubject(subject._id)}
+							>
+								Save
+							</button>
+							<button
+								className="p-2 bg-blue-500 rounded ml-4"
+								onClick={() => handleDeleteSubject(subject._id)}
+							>
+								Delete
+							</button>
+						</div>
+					))}
+				</div>
 			</div>
 		</section>
 	);

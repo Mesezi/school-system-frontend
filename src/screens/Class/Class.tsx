@@ -4,12 +4,9 @@ import * as yup from "yup";
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import FormInput from "@/components/Form/FormInput";
 import FormSelect from "@/components/Form/FormSelect";
-import FormCheckBox from "@/components/Form/FormCheckBox";
 import { addClass, getAllClasses, deleteClass } from "@/services/classService";
 import { useRouter } from "next/navigation";
 import { RiLoader4Fill } from "react-icons/ri";
-import { updateTimeTable } from "@/services/classService";
-import { times } from "../../../utils";
 import { classSubjectData, classSchema } from "@/interfaces/classInterface";
 import Link from "next/link";
 
@@ -17,6 +14,9 @@ import Link from "next/link";
 // --send applications
 //no situation that calls for you to be scared
 //menu needs to add id and change subject to subjectDescription
+//add subject is not updating scheme of work in its response
+//add class subject
+//refactor this code like a normal human being
 
 export interface classData {
 	id: string;
@@ -84,45 +84,6 @@ function Class() {
 	useEffect(() => {
 		handleAllClasses();
 	}, []);
-
-	const handleChange = (e: any) => {
-		setTimeTableForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-	};
-
-	const handleTimeTable = async (
-		id: string,
-		data: TimeTableForm,
-		prevData: classData
-	) => {
-		console.log(prevData);
-		let requestData = { ...prevData.timetable };
-		// if data exists, push else replace
-		if (requestData[data.day]) {
-			requestData[data.day].push({
-				startTime: data.startTime,
-				endTime: data.endTime,
-				subject: data.subject,
-			});
-		} else {
-			requestData[data.day] = [
-				{
-					startTime: data.startTime,
-					endTime: data.endTime,
-					subject: data.subject,
-				},
-			];
-		}
-
-		console.log(requestData);
-		try {
-			const res = await updateTimeTable(id, requestData);
-			router.refresh();
-			alert("Time table updated successfully");
-		} catch (err) {
-			alert("An error occured while updating timetable");
-			console.log(err);
-		}
-	};
 
 	const handleAllClasses = async () => {
 		try {

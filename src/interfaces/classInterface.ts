@@ -5,10 +5,10 @@ export interface SchemeOfWorkItem {
 }
 
 export interface classSubjectData {
-	title: string;
+	name: string;
 	subjectDescription: string;
 	schemeOfWork: SchemeOfWorkItem[];
-	_id: string;
+	id: string;
 }
 
 export interface classSchema {

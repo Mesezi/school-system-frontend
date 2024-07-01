@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { RiLoader4Fill } from "react-icons/ri";
 import { classSubjectData, classSchema } from "@/interfaces/classInterface";
 import Link from "next/link";
+import { v4 as uuidv4 } from "uuid";
+import AddSubjectForm from "@/components/AddSubjectForm";
 
 // -- use chatgpt reference
 // --send applications
@@ -49,7 +51,7 @@ const createClassFormSchema = yup.object({
 	type: yup
 		.string()
 		.oneOf(
-			["", "Primary", "Junior Secondary", "Senior Secondary"],
+			["", "primary", "junior-secondary", "senior-secondary"],
 			"Invalid class"
 		)
 		.required("Select a valid class"),
@@ -57,7 +59,7 @@ const createClassFormSchema = yup.object({
 	name: yup.string().required("Class name is required"),
 	subjects: yup.array().of(
 		yup.object().shape({
-			title: yup.string().required("Required"),
+			name: yup.string().required("Required"),
 			subjectDescription: yup.string().required("Required"),
 			schemeOfWork: yup.array().of(
 				yup.object().shape({
@@ -73,12 +75,8 @@ const createClassFormSchema = yup.object({
 		})
 	),
 });
-type classTypes = yup.InferType<typeof createClassFormSchema>;
 
 function Class() {
-	const [showTimeTable, setShowTimeTable] = useState<boolean>(false);
-	const [timeTableForm, setTimeTableForm] =
-		useState<TimeTableForm>(initialFormState);
 	const router = useRouter();
 	const [allClasses, setAllClasses] = useState<any>();
 	useEffect(() => {
@@ -89,7 +87,7 @@ function Class() {
 		try {
 			const res = await getAllClasses();
 			setAllClasses(res.data);
-			console.log(res.data);
+			// console.log(res.data);
 		} catch (err: any) {
 			const errorMessage = err?.message || "An error occurred";
 			alert(errorMessage);
@@ -102,12 +100,13 @@ function Class() {
 		setSubmitting(true);
 		console.log(values);
 		console.log("submitted");
-		setSubmitting(false);
 		try {
 			setSubmitting(false);
 			const res = await addClass(values);
+			console.log(res);
 			router.refresh();
 		} catch (err) {
+			alert("an error occured");
 			console.log(err);
 		} finally {
 			setSubmitting(false);
@@ -117,6 +116,8 @@ function Class() {
 	const handleDeleteClass = async (id: string) => {
 		try {
 			const res = await deleteClass(id);
+			console.log(res);
+			alert(res.message);
 			router.refresh();
 		} catch (err) {
 			alert("unable to delete class atm, please try again");
@@ -158,7 +159,7 @@ function Class() {
 						<div className="flex items-center gap-4">
 							<p className="underline">Class Subjects:</p>
 							{item?.subjects.map((subject: classSubjectData, index) => (
-								<p key={index}>{subject.title},</p>
+								<p key={index}>{subject.name},</p>
 							))}
 						</div>
 						<div className="flex items-center gap-4">
@@ -200,7 +201,8 @@ function Class() {
 							name: "",
 							subjects: [
 								{
-									title: "",
+									id: uuidv4(),
+									name: "",
 									subjectDescription: "",
 									schemeOfWork: [{ week: "", topic: "", description: "" }],
 								},
@@ -228,9 +230,9 @@ function Class() {
 										<FormSelect label="Class type" name="type">
 											<option value="">Select a class type</option>
 
-											<option value="Primary">Primary</option>
-											<option value="Junior Secondary">Junior Secondary</option>
-											<option value="Senior Secondary">Senior Secondary</option>
+											<option value="primary">Primary</option>
+											<option value="junior-secondary">Junior Secondary</option>
+											<option value="senior-secondary">Senior Secondary</option>
 										</FormSelect>
 
 										<FormSelect label=" Level" name="level">
@@ -253,182 +255,7 @@ function Class() {
 											}}
 										/>
 
-										<FieldArray name="subjects">
-											{({ insert, remove, push }) => (
-												<div className="">
-													<h3 className="text-lg text-orange-500 underline">
-														Subjects
-													</h3>
-													{values.subjects.length > 0 &&
-														values.subjects.map((subject: any, index: any) => (
-															<div
-																key={index}
-																className="flex gap-4 flex-col border-blue-500 border p-4 my-2"
-															>
-																<div className="flex flex-col">
-																	<label htmlFor={`subjects.${index}.title`}>
-																		Subject Name
-																	</label>
-																	<Field
-																		className="w-full h-[2.8rem] mt-1 px-3 border rounded-md
-					placeholder:text-[#A1A7AD] outline-none bg-white text-black"
-																		name={`subjects.${index}.title`}
-																	/>
-																	<ErrorMessage
-																		className="text-red-500"
-																		name={`subjects.${index}.title`}
-																		component="div"
-																	/>
-																</div>
-
-																<div className="flex flex-col">
-																	<label
-																		htmlFor={`subjects.${index}.subjectDescription`}
-																	>
-																		Subject Description
-																	</label>
-																	<Field
-																		className="w-full h-[2.8rem] mt-1 px-3 border rounded-md
-					placeholder:text-[#A1A7AD] outline-none bg-white text-black"
-																		name={`subjects.${index}.subjectDescription`}
-																	/>
-																	<ErrorMessage
-																		className="text-red-500"
-																		name={`subjects.${index}.subjectDescription`}
-																		component="div"
-																	/>
-																</div>
-
-																<FieldArray
-																	name={`subjects.${index}.schemeOfWork`}
-																>
-																	{({
-																		insert: insertWeek,
-																		remove: removeWeek,
-																		push: pushWeek,
-																	}) => (
-																		<div className="">
-																			<h4 className="underline text-orange-500">
-																				Scheme of Work
-																			</h4>
-																			{subject.schemeOfWork.length > 0 &&
-																				subject.schemeOfWork.map(
-																					(week: any, weekIndex: any) => (
-																						<div
-																							key={weekIndex}
-																							className="flex flex-col gap-4 border-orange-500 border p-2 m-2"
-																						>
-																							<div className="flex flex-col">
-																								<label
-																									htmlFor={`subjects.${index}.schemeOfWork.${weekIndex}.week`}
-																								>
-																									Week No
-																								</label>
-																								<Field
-																									className="w-full h-[2.8rem] mt-1 px-3 border rounded-md
-																								placeholder:text-[#A1A7AD] outline-none bg-white text-black"
-																									name={`subjects.${index}.schemeOfWork.${weekIndex}.week`}
-																									type="number"
-																								/>
-																								<ErrorMessage
-																									name={`subjects.${index}.schemeOfWork.${weekIndex}.week`}
-																									component="div"
-																									className="text-red-500"
-																								/>
-																							</div>
-
-																							<div className="flex flex-col">
-																								<label
-																									htmlFor={`subjects.${index}.schemeOfWork.${weekIndex}.topic`}
-																								>
-																									Topic Title
-																								</label>
-																								<Field
-																									className="w-full h-[2.8rem] mt-1 px-3 border rounded-md
-																								placeholder:text-[#A1A7AD] outline-none bg-white text-black"
-																									name={`subjects.${index}.schemeOfWork.${weekIndex}.topic`}
-																								/>
-																								<ErrorMessage
-																									name={`subjects.${index}.schemeOfWork.${weekIndex}.topic`}
-																									component="div"
-																									className="text-red-500"
-																								/>
-																							</div>
-
-																							<div className="flex flex-col">
-																								<label
-																									htmlFor={`subjects.${index}.schemeOfWork.${weekIndex}.description`}
-																								>
-																									Topic Description
-																								</label>
-																								<Field
-																									className="w-full h-[2.8rem] mt-1 px-3 border rounded-md
-																								placeholder:text-[#A1A7AD] outline-none bg-white text-black"
-																									name={`subjects.${index}.schemeOfWork.${weekIndex}.description`}
-																								/>
-																								<ErrorMessage
-																									name={`subjects.${index}.schemeOfWork.${weekIndex}.description`}
-																									component="div"
-																									className="text-red-500"
-																								/>
-																							</div>
-
-																							<button
-																								className="bg-red-500 p-1 rounded"
-																								type="button"
-																								onClick={() =>
-																									removeWeek(weekIndex)
-																								}
-																							>
-																								Remove Week
-																							</button>
-																						</div>
-																					)
-																				)}
-																			<button
-																				className=" bg-orange-500 p-1 mt-2 rounded w-full"
-																				type="button"
-																				onClick={() =>
-																					pushWeek({
-																						week: "",
-																						topic: "",
-																						description: "",
-																					})
-																				}
-																			>
-																				Add Week
-																			</button>
-																		</div>
-																	)}
-																</FieldArray>
-
-																<button
-																	className="bg-red-500 p-1 mt-2 rounde"
-																	type="button"
-																	onClick={() => remove(index)}
-																>
-																	Remove Subject
-																</button>
-															</div>
-														))}
-													<button
-														className="p-1 bg-blue-500 rounded mt-2 w-full"
-														type="button"
-														onClick={() =>
-															push({
-																title: "",
-																subjectDescription: "",
-																schemeOfWork: [
-																	{ week: "", topic: "", description: "" },
-																],
-															})
-														}
-													>
-														Add Subject
-													</button>
-												</div>
-											)}
-										</FieldArray>
+										<AddSubjectForm subjectData={values.subjects} />
 									</section>
 
 									{/* <div className="flex justify-center mt-4"> */}

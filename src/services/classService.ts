@@ -66,3 +66,11 @@ export const deleteClassSubject = async (
 	}
 	throw new Error(response.data.message);
 };
+
+export const addClassSubject = async (data: any, classId: string) => {
+	const response = await axios.post(`api/class/subjects/add/${classId}/`, data);
+	if (response.status === 200 || response.status === 201) {
+		return response.data;
+	}
+	throw new Error(response.data.message);
+};

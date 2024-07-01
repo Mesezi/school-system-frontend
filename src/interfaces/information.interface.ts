@@ -18,7 +18,7 @@ export interface subjectsSchema {
 	primary: string[];
 	juniorSecondary: string[];
 	seniorSecondary: string[];
-	_id?: any;
+	id?: any;
 }
 
 export interface schoolInformationData {

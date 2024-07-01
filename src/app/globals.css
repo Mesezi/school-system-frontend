@@ -13,6 +13,21 @@ body {
 	background: #000000;
 }
 
+table {
+	width: 100%;
+	border-collapse: collapse;
+  }
+  
+  th, td {
+	border: 1px solid #ddd;
+	padding: 8px;
+	text-align: center;
+  }
+  
+  th {
+	background-color: #111111;
+  }
+
 @layer utilities {
 	.text-balance {
 		text-wrap: balance;

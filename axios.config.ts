@@ -6,14 +6,14 @@ const axios = Axios.create({
 	baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
 });
 
-// Check if window is defined before accessing sessionStorage
-const authUser =
-	typeof window !== "undefined" && sessionStorage.getItem("schoolSystemUser")
-		? JSON.parse(sessionStorage.getItem("schoolSystemUser") ?? "")
-		: null;
-
 axios.interceptors.request.use(
 	(config) => {
+		// Check if window is defined before accessing sessionStorage
+		const authUser =
+			typeof window !== "undefined" &&
+			sessionStorage.getItem("schoolSystemUser")
+				? JSON.parse(sessionStorage.getItem("schoolSystemUser") ?? "")
+				: null;
 		config.url = config.url?.replace(/[^\x20-\x7E]/g, "");
 		config.headers!["Content-Type"] = "application/json";
 		if (authUser) {
@@ -28,6 +28,10 @@ axios.interceptors.request.use(
 );
 
 axios.interceptors.response.use(undefined, (err) => {
+	const authUser =
+		typeof window !== "undefined" && sessionStorage.getItem("schoolSystemUser")
+			? JSON.parse(sessionStorage.getItem("schoolSystemUser") ?? "")
+			: null;
 	if (
 		err.response?.status === 403 ||
 		err.response?.data?.message === "Unauthorized"

@@ -4,7 +4,7 @@ import { getSchoolInfo, editSubjects } from "@/services/informationService";
 import { RiLoader4Fill } from "react-icons/ri";
 import { useAppSelector, useAppDispatch } from "@/lib/hook";
 import { setSchoolInformation } from "@/lib/slices/SchoolInformationSlice";
-import { subjectsSchema } from "@/interfaces/information.interface";
+import { SchoolSubjectsSchema } from "@/interfaces/information.interface";
 import { useRouter } from "next/navigation";
 
 function Subjects() {
@@ -13,9 +13,8 @@ function Subjects() {
 	const data = useAppSelector(
 		(state: { information: any }) => state.information
 	);
-
 	const [isloading, setIsloading] = useState<boolean>(false);
-	const [schoolSubjects, setSchoolSubjects] = useState<subjectsSchema>(
+	const [schoolSubjects, setSchoolSubjects] = useState<SchoolSubjectsSchema>(
 		data?.information?.schoolSubjects || {}
 	);
 	const [newSubject, setNewSubject] = useState("");
@@ -25,6 +24,7 @@ function Subjects() {
 		try {
 			const res = await getSchoolInfo();
 			dispatch(setSchoolInformation(res.data));
+			router.refresh();
 		} catch (err: any) {
 			console.log(err);
 		} finally {
@@ -36,7 +36,7 @@ function Subjects() {
 			setSchoolSubjects((prevSubjects) => ({
 				...prevSubjects,
 				[category]: [
-					...prevSubjects[category as keyof subjectsSchema],
+					...prevSubjects[category as keyof SchoolSubjectsSchema],
 					newSubject,
 				],
 			}));
@@ -50,28 +50,28 @@ function Subjects() {
 		category: string
 	) => {
 		const updatedSubjects = [
-			...schoolSubjects[category as keyof subjectsSchema],
+			...schoolSubjects[category as keyof SchoolSubjectsSchema],
 		];
 		updatedSubjects[index] = e.target.value;
 		setSchoolSubjects({
 			...schoolSubjects,
 			[category]: updatedSubjects,
 		});
-		console.log(schoolSubjects);
 	};
 
-	const saveSubjects = async (data: subjectsSchema) => {
+	const saveSubjects = async (data: SchoolSubjectsSchema) => {
 		setIsloading(true);
 		try {
 			const { _id, ...subjectsWithoutId } = data;
 			const res = await editSubjects(subjectsWithoutId);
+			// call global state
 			handleSchoolInfo();
-			console.log(res);
 			setIsloading(false);
+			alert(res.message);
 		} catch (err: any) {
 			setIsloading(false);
 			console.log(err);
-			router.refresh();
+			alert(err.message);
 		} finally {
 			setIsloading(false);
 		}

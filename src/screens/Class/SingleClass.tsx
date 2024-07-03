@@ -19,7 +19,6 @@ import { classData } from "./Class";
 import TimeTableSchedule from "@/components/TimetableSchedule";
 import AddSubjectForm from "@/components/AddSubjectForm";
 import { v4 as uuidv4 } from "uuid";
-import { subjectsSchema } from "@/interfaces/information.interface";
 
 interface TimetableItem {
 	startTime: string;

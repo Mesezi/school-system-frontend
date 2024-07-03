@@ -22,7 +22,10 @@ function Sidebar() {
 				<p>School Session/Term</p>
 			</Link>
 			<Link href="/dashboard/students">
-				<p>Students</p>
+				<p> Add Students</p>
+			</Link>
+			<Link href="/dashboard/students/details">
+				<p>Student details</p>
 			</Link>
 		</div>
 	);

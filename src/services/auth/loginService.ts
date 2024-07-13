@@ -1,7 +1,7 @@
 import axios from "../../../axios.config";
 
 export const loginUser = async (data: any) => {
-	const response = await axios.post("/api/user/login", data);
+	const response = await axios.post("/api/superAdmin/login", data);
 
 	if (response.status === 200 || response.status === 201) {
 		return response.data;

@@ -1,8 +1,8 @@
 import React from "react";
-import Students from "@/screens/Students/Students";
+import AddStudent from "@/screens/Students/AddStudent";
 
 function page() {
-	return <Students />;
+	return <AddStudent />;
 }
 
 export default page;

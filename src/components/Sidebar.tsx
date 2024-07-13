@@ -27,6 +27,9 @@ function Sidebar() {
 			<Link href="/dashboard/students/details">
 				<p>Student details</p>
 			</Link>
+			<Link href="/dashboard/create-admin">
+				<p>Create Admin</p>
+			</Link>
 		</div>
 	);
 }

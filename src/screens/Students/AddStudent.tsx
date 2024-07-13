@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { addStudentRequest } from "@/interfaces/studentInterface";
 import * as yup from "yup";
@@ -9,8 +9,25 @@ import { addStudent } from "@/services/studentService";
 import { RiLoader4Fill } from "react-icons/ri";
 import { useRouter } from "next/navigation";
 import { getAllClasses } from "@/services/classService";
+import { ClassContext, ClassProvider } from "@/Providers/ClassContext";
 
-const validationSchema = yup.object({
+export const validationSchema = (isPasswordRequired: boolean) => {
+	return yup.object({
+		email: yup.string().email().required("Enter email address"),
+		password: isPasswordRequired
+			? yup.string().required("Enter password")
+			: yup.string().notRequired(),
+		firstName: yup.string().required("Enter first name"),
+		lastName: yup.string().required("Enter last name"),
+		sex: yup
+			.string()
+			.oneOf(["male", "female"], "Sex must be either male or female")
+			.required("Sex is required"),
+		dob: yup.string().required("Enter date of birth"),
+		classId: yup.string().required("Select your current class"),
+	});
+};
+yup.object({
 	email: yup.string().email().required("Enter email address"),
 	password: yup.string().required("Enter password"),
 	firstName: yup.string().required("Enter first name"),
@@ -22,14 +39,12 @@ const validationSchema = yup.object({
 	dob: yup.string().required("Enter date of birth"),
 	classId: yup.string().required("Select your current class"),
 });
-function Students() {
+function AddStudent() {
+	//get class from context
+	const allClasses = useContext(ClassContext);
+	// console.log(allClasses)
 	const router = useRouter();
-	const [allClasses, setAllClasses] = useState<{ id: string; name: string }[]>(
-		[]
-	);
-	useEffect(() => {
-		handleAllClasses();
-	}, []);
+
 	const handleAddStudent = async (
 		data: addStudentRequest,
 		setSubmitting: any
@@ -49,28 +64,6 @@ function Students() {
 		}
 	};
 
-	//can cache this guy sef
-	const handleAllClasses = async () => {
-		try {
-			const res = await getAllClasses();
-			if (res.data.length > 0) {
-				const classDetails = res.data.map((item: any) => ({
-					id: item.id,
-					name: item.name,
-				}));
-				// console.log(classDetails);
-				setAllClasses(classDetails);
-			} else {
-				setAllClasses([]);
-			}
-		} catch (err: any) {
-			const errorMessage = err?.message || "An error occurred";
-			alert(errorMessage);
-			setAllClasses([]);
-			console.log(err);
-		} finally {
-		}
-	};
 	return (
 		<section className="p-2">
 			<main>
@@ -188,4 +181,4 @@ function Students() {
 	);
 }
 
-export default Students;
+export default AddStudent;

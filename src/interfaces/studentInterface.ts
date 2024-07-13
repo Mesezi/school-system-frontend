@@ -8,3 +8,8 @@ export interface addStudentRequest {
 	imageUrl: string;
 	classId: string;
 }
+
+export interface StudentData extends addStudentRequest {
+	createdAt: string;
+	id: string;
+}

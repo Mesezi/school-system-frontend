@@ -1,9 +1,15 @@
-
 import Link from "next/link";
 
 export default function Home() {
 	return (
 		<section>
+			<header className="border border-white-500 w-full max-w-[1400px] p-4 flex items-center">
+				New School Owner? Register
+				{" "}
+				    <Link className="underline" href={"/register"}>
+					here
+				    </Link>
+			</header>
 			<main className="flex flex-col lg:flex-row	 min-h-screen  items-center justify-between p-24">
 				<Link href={"/admin-login"}>
 					<div className="border border-red-600 cursor-pointer flex justify-center items-center h-20 rounded p-4">

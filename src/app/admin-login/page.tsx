@@ -9,7 +9,7 @@ import FormPasswordInput from "@/components/Form/FormPasswordInput";
 import { useRouter } from "next/navigation";
 
 const loginFormSchema = yup.object({
-	email: yup.string().email().required("Enter email address"),
+	username: yup.string().required("Enter username"),
 	password: yup.string().required("Enter password"),
 });
 
@@ -19,7 +19,8 @@ const page = () => {
 	const router = useRouter();
 	const handleLogin = async (values: loginTypes, setSubmitting: any) => {
 		try {
-			const res = await loginUser(values, 'super');
+			const res = await loginUser(values, "admin");
+			console.log(res);
 			if (res) {
 				console.log("logged in ooo");
 				sessionStorage.setItem("schoolSystemUser", JSON.stringify(res));
@@ -38,7 +39,7 @@ const page = () => {
 		<div>
 			<Formik
 				initialValues={{
-					email: "",
+					username: "",
 					password: "",
 				}}
 				validationSchema={loginFormSchema}
@@ -51,12 +52,12 @@ const page = () => {
 						<Form className="space-y-2 mt-4 max-w-[400px] p-4">
 							<section className="grid w-full gap-2">
 								<FormInput
-									id="email"
-									name="email"
-									placeholder="Enter email"
-									label="Email / username"
+									id="username"
+									name="username"
+									placeholder="Enter username"
+									label="username"
 									onChange={(e) => {
-										setFieldValue("email", e.target.value);
+										setFieldValue("username", e.target.value);
 									}}
 								/>
 

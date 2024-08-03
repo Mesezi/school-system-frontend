@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction} from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { Field, ErrorMessage } from "formik";
 
 interface FieldProps {
@@ -21,16 +21,11 @@ const FormInput: React.FC<FieldProps> = ({
 	placeholder,
 	type,
 	onChange,
-	className,
-	isDisabled,
 }) => {
 	return (
-		<div className='w-full flex flex-col items-start '>
+		<div className="w-full flex flex-col items-start ">
 			{label && (
-				<label
-					htmlFor={name}
-					className="font-medium text-[white] text-[.9rem]"
-				>
+				<label htmlFor={name} className="font-medium text-[white] text-[.9rem]">
 					{label}
 				</label>
 			)}
@@ -51,6 +46,7 @@ const FormInput: React.FC<FieldProps> = ({
 					meta: any;
 				}) => (
 					<input
+						type={type}
 						{...field}
 						placeholder={placeholder}
 						className={` w-full h-[2.8rem] mt-1 px-3 border rounded-md

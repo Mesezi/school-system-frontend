@@ -1,5 +1,5 @@
 "use client";
-import React,{ useContext, createContext, useEffect, useState } from "react";
+import React,{ createContext, useEffect, useState } from "react";
 import { getAllClasses } from "@/services/classService";
 
 export const ClassContext = createContext<{ id: string; name: string }[]>([]);

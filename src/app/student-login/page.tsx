@@ -19,13 +19,13 @@ const page = () => {
 	const router = useRouter();
 	const handleLogin = async (values: loginTypes, setSubmitting: any) => {
 		try {
-			const res = await loginUser(values, 'super');
+			const res = await loginUser(values, 'student');
 			if (res) {
 				console.log("logged in ooo");
 				sessionStorage.setItem("schoolSystemUser", JSON.stringify(res));
 				socket.connect();
 				socket.emit("joinRoom", res?.user?.schoolId);
-				router.push("/admin-dashboard");
+				router.push("/student-dashboard");
 			}
 		} catch (err) {
 			console.log(err);

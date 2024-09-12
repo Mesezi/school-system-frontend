@@ -27,8 +27,9 @@ const page = () => {
 				socket.emit("joinRoom", res?.user?.schoolId);
 				router.push("/admin-dashboard");
 			}
-		} catch (err) {
+		} catch (err:any) {
 			console.log(err);
+			alert(err?.response?.data?.message)
 		} finally {
 			setSubmitting(false);
 		}
@@ -54,7 +55,7 @@ const page = () => {
 									id="email"
 									name="email"
 									placeholder="Enter email"
-									label="Email / username"
+									label="Email"
 									onChange={(e) => {
 										setFieldValue("email", e.target.value);
 									}}

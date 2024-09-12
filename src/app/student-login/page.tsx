@@ -19,7 +19,7 @@ const page = () => {
 	const router = useRouter();
 	const handleLogin = async (values: loginTypes, setSubmitting: any) => {
 		try {
-			const res = await loginUser(values, 'student');
+			const res = await loginUser(values, "student");
 			if (res) {
 				console.log("logged in ooo");
 				sessionStorage.setItem("schoolSystemUser", JSON.stringify(res));
@@ -27,7 +27,8 @@ const page = () => {
 				socket.emit("joinRoom", res?.user?.schoolId);
 				router.push("/student-dashboard");
 			}
-		} catch (err) {
+		} catch (err: any) {
+			alert(err?.response?.data?.message);
 			console.log(err);
 		} finally {
 			setSubmitting(false);
@@ -73,7 +74,7 @@ const page = () => {
 
 							<div className="flex justify-center mt-4">
 								<button
-									disabled={isSubmitting}
+									disabled={false}
 									className="p-3 bg-green font-semibold text-white rounded-md w-full 
                               md:max-w-[15rem] flex items-center justify-center h-12 border border-red-500"
 									type="submit"

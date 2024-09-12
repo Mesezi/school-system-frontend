@@ -75,6 +75,11 @@ function StudentDetails() {
 									View More
 								</Link>
 							</button>
+							<button className="bg-orange-900 text-white p-1 w-[10rem] rounded">
+							<Link href={`/admin-dashboard/result/${item.id}`}>
+									Process result
+								</Link>
+							</button>
 							<button
 								onClick={() => handleDelete(item.id)}
 								className="bg-orange-900 text-white p-1 w-[10rem] rounded"

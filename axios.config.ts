@@ -33,8 +33,8 @@ axios.interceptors.response.use(undefined, (err) => {
 			? JSON.parse(sessionStorage.getItem("schoolSystemUser") ?? "")
 			: null;
 	if (
-		err.response?.status === 403 ||
-		err.response?.data?.message === "Unauthorized"
+		err.response?.status === 401 ||
+		err.response?.data?.message === "Authentication Failed"
 	) {
 		sessionStorage.setItem("schoolSystemUser", JSON.stringify(null));
 		window.location.reload();

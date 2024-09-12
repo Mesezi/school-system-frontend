@@ -1,6 +1,6 @@
 "use client";
-import { loginUser } from "@/services/auth/loginService";
 import React from "react";
+import { loginUser } from "@/services/auth/loginService";
 import * as yup from "yup";
 import { socket } from "@/app/socket";
 import { Form, Formik } from "formik";
@@ -9,18 +9,16 @@ import FormPasswordInput from "@/components/Form/FormPasswordInput";
 import { useRouter } from "next/navigation";
 
 const loginFormSchema = yup.object({
-	username: yup.string().required("Enter username"),
+	username: yup.string().email().required("Enter your class username"),
 	password: yup.string().required("Enter password"),
 });
 
 type loginTypes = yup.InferType<typeof loginFormSchema>;
-
 const page = () => {
 	const router = useRouter();
 	const handleLogin = async (values: loginTypes, setSubmitting: any) => {
 		try {
-			const res = await loginUser(values, "admin");
-			console.log(res);
+			const res = await loginUser(values, "class");
 			if (res) {
 				console.log("logged in ooo");
 				sessionStorage.setItem("schoolSystemUser", JSON.stringify(res));
@@ -28,14 +26,13 @@ const page = () => {
 				socket.emit("joinRoom", res?.user?.schoolId);
 				router.push("/admin-dashboard");
 			}
-		} catch (err: any) {
+		} catch (err:any) {
+            alert(err?.response?.data?.message)
 			console.log(err);
-			alert(err?.response?.data?.message);
 		} finally {
 			setSubmitting(false);
 		}
 	};
-
 	return (
 		<div>
 			<Formik
@@ -77,7 +74,7 @@ const page = () => {
 								<button
 									disabled={isSubmitting}
 									className="p-3 bg-green font-semibold text-white rounded-md w-full 
-                              md:max-w-[15rem] flex items-center justify-center h-12 border border-red-500"
+                      md:max-w-[15rem] flex items-center justify-center h-12 border border-red-500"
 									type="submit"
 								>
 									Submit

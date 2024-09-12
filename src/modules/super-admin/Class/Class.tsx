@@ -22,7 +22,7 @@ import AddSubjectForm from "@/components/AddSubjectForm";
 
 export interface classData {
 	id: string;
-	userName: string;
+	username: string;
 	type: string;
 	level: string;
 	name: string;
@@ -47,7 +47,8 @@ const initialFormState: TimeTableForm = {
 };
 
 const createClassFormSchema = yup.object({
-	userName: yup.string().required("Username cannot be empty"),
+	username: yup.string().required("username cannot be empty"),
+	password: yup.string().required("Enter temporary admin password"),
 	type: yup
 		.string()
 		.oneOf(
@@ -103,6 +104,7 @@ function Class() {
 		try {
 			setSubmitting(false);
 			const res = await addClass(values);
+			alert(res?.message)
 			console.log(res);
 			router.refresh();
 		} catch (err) {
@@ -141,8 +143,8 @@ function Class() {
 						className="flex flex-col gap-2 text-white border border-red-500"
 					>
 						<div className="flex items-center gap-4">
-							<p className="underline">CLASS ID / USERNAME:</p>
-							<p>{item.userName}</p>
+							<p className="underline">CLASS ID / username:</p>
+							<p>{item.username}</p>
 						</div>
 						<div className="flex items-center gap-4">
 							<p className="underline">TYPE:</p>
@@ -195,10 +197,11 @@ function Class() {
 					<p className="text-bold text-2xl mt-4 underline">Create Class</p>
 					<Formik
 						initialValues={{
-							userName: "",
+							username: "",
 							type: "",
 							level: "",
 							name: "",
+							password: "",
 							subjects: [
 								{
 									id: uuidv4(),
@@ -218,12 +221,22 @@ function Class() {
 								<Form className="space-y-2 max-w-[400px] p-4">
 									<section className="grid w-full gap-1">
 										<FormInput
-											id="userName"
-											name="userName"
+											id="username"
+											name="username"
 											placeholder="Enter login id for this class"
-											label="Username/LOGIN ID"
+											label="username/LOGIN ID"
 											onChange={(e) => {
-												setFieldValue("userName", e.target.value);
+												setFieldValue("username", e.target.value);
+											}}
+										/>
+
+										<FormInput
+											id="password"
+											name="password"
+											placeholder="Enter password"
+											label="Password"
+											onChange={(e) => {
+												setFieldValue("password", e.target.value);
 											}}
 										/>
 

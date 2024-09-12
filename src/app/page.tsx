@@ -21,6 +21,11 @@ export default function Home() {
 						Super Admin Login
 					</div>
 				</Link>
+				<Link href={"/class-login"}>
+					<div className="border flex justify-center items-center border-pink-500 cursor-pointer h-20 rounded p-4">
+						Class Login
+					</div>
+				</Link>
 				<Link href={"/student-login"}>
 					<div className="border flex justify-center items-center border-blue-500 cursor-pointer h-20 rounded p-4">
 						Student Login

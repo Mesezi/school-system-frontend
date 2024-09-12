@@ -3,7 +3,7 @@ export interface AddAdminRequest {
 	password: string;
 	firstName: string;
 	lastName: string;
-	username: string;
+	username?: string;
 	schoolName: string;
 	phoneNumber: string;
 	role: string;

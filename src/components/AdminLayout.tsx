@@ -46,6 +46,9 @@ function AdminLayout({
 					<Link href="/admin-dashboard/create-admin">
 						<p>Create Admin</p>
 					</Link>
+					<Link href="/admin-dashboard/result">
+						<p>Results Processing</p>
+					</Link>
 
 					<p className="cursor-pointer" onClick={logout}>Logout</p>
 				</div>

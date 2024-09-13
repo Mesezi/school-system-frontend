@@ -11,14 +11,19 @@ function StudentDetails() {
 	//fail fast
 	//proper pagination, cuz i can see pagination as part of the response
 	const [studentData, setStudentData] = useState<StudentData[]>([]);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	useEffect(() => {
 		handleAllStudents();
 	}, []);
 	const handleAllStudents = async () => {
+		setIsLoading(true);
 		try {
 			const res = await getAllStudents();
 			res.data.length > 0 ? setStudentData(res.data) : setStudentData([]);
+			setIsLoading(false);
+			// console.log(res.data)
 		} catch (err: any) {
+			setIsLoading(false);
 			console.log(err);
 			alert(err.message);
 		}
@@ -34,6 +39,8 @@ function StudentDetails() {
 			alert(err.message);
 		}
 	};
+
+	if (isLoading) return <p>Loading...</p>;
 	return (
 		<section className="px-2">
 			<p className="text-center underline text-orange-500 text-lg">
@@ -76,7 +83,9 @@ function StudentDetails() {
 								</Link>
 							</button>
 							<button className="bg-orange-900 text-white p-1 w-[10rem] rounded">
-							<Link href={`/admin-dashboard/result/${item.id}`}>
+								<Link
+									href={`/admin-dashboard/result/${item.id}?classId=${item.classId}`}
+								>
 									Process result
 								</Link>
 							</button>
@@ -89,7 +98,7 @@ function StudentDetails() {
 						</main>
 					))
 				) : (
-					<p>loading...</p>
+					<p>No student found, you can add new students in the students tab</p>
 				)}
 			</div>
 		</section>

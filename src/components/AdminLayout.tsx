@@ -49,8 +49,9 @@ function AdminLayout({
 					<Link href="/admin-dashboard/result">
 						<p>Results Processing</p>
 					</Link>
-
+					<Link href="/login">
 					<p className="cursor-pointer" onClick={logout}>Logout</p>
+					</Link>
 				</div>
 			</aside>
 			<main className="ml-[16rem] w-[calc(100%-16rem)]">{children}</main>

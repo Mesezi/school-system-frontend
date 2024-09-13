@@ -3,7 +3,7 @@ import React from 'react'
 
 function page() {
   return (
-    <div className='p-2'>Results</div>
+    <div className='p-2'>Bulk upload and all</div>
   )
 }
 

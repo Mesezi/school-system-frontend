@@ -88,7 +88,7 @@ function Class() {
 		try {
 			const res = await getAllClasses();
 			setAllClasses(res.data);
-			// console.log(res.data);
+			console.log(res.data);
 		} catch (err: any) {
 			const errorMessage = err?.message || "An error occurred";
 			alert(errorMessage);

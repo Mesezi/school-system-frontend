@@ -56,7 +56,7 @@ function SingleClass() {
 	const params = useParams<{ id: string }>();
 	const [classData, setClassData] = useState<classData>({
 		id: "",
-		userName: "",
+		username: "",
 		type: "",
 		level: "",
 		name: "",
@@ -77,6 +77,7 @@ function SingleClass() {
 		try {
 			const res = await getClassInfo(params.id);
 			setClassData(res.data.classInformation);
+			// console.log(res)
 			// console.log(res.data.classInformation.timetable);
 			setClassStudents(res.data.students);
 			setClassTimetable(res.data.classInformation.timetable);
@@ -86,7 +87,7 @@ function SingleClass() {
 			alert(errorMessage);
 			setClassData({
 				id: "",
-				userName: "",
+				username: "",
 				type: "",
 				level: "",
 				name: "",
@@ -229,12 +230,17 @@ function SingleClass() {
 		//since your data is in an array, and api requires object, use promise.all
 		setSubmitting(true);
 		console.log(values);
+		//remove ids that was used to track form state 
+		const subjectData = values.map(({id, ...data})=>{
+			return {...data}
+		})
+
 		try {
-			const promises = values.map((value: any) =>
+			const promises = subjectData.map((value: any) =>
 				addClassSubject(value, params.id)
 			);
 			const responses = await Promise.all(promises);
-			console.log(responses);
+			alert(responses[0].message)
 			router.refresh();
 		} catch (err) {
 			console.log(err);
@@ -252,7 +258,7 @@ function SingleClass() {
                  outline-none bg-white text-black"
 						type="text"
 						name="userName"
-						value={classData?.userName}
+						value={classData?.username}
 						onChange={(e) =>
 							setClassData({ ...classData, [e.target.name]: e.target.value })
 						}

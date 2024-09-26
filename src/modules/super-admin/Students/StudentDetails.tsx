@@ -21,7 +21,7 @@ function StudentDetails() {
 			const res = await getAllStudents();
 			res.data.length > 0 ? setStudentData(res.data) : setStudentData([]);
 			setIsLoading(false);
-			// console.log(res.data)
+			console.log(res.data)
 		} catch (err: any) {
 			setIsLoading(false);
 			console.log(err);

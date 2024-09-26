@@ -9,8 +9,13 @@ export const addStudent = async (data: addStudentRequest) => {
 	throw new Error(response.data.message);
 };
 
-export const getAllStudents = async () => {
-	const response = await axios.get("api/student/all");
+export const getAllStudents = async (queries = {}) => {
+	const baseUrl =
+		"https://school-system-backend-42tr.onrender.com/api/student/all";
+	const queryString = new URLSearchParams(queries).toString();
+	// Append query string to base URL if there are any queries
+	const fullUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+	const response = await axios.get(fullUrl);
 	if (response.status === 200 || response.status === 201) {
 		return response.data;
 	}
@@ -33,11 +38,10 @@ export const updateStudentDetails = async (id: string, data: any) => {
 	throw new Error(response.data.message);
 };
 
-
-export const deleteStudent = async (id: string,)=>{
-    const response = await axios.delete(`api/student/delete/${id}`);
+export const deleteStudent = async (id: string) => {
+	const response = await axios.delete(`api/student/delete/${id}`);
 	if (response.status === 200 || response.status === 201) {
 		return response.data;
 	}
 	throw new Error(response.data.message);
-}
+};

@@ -15,7 +15,14 @@ axios.interceptors.request.use(
 				? JSON.parse(sessionStorage.getItem("schoolSystemUser") ?? "")
 				: null;
 		config.url = config.url?.replace(/[^\x20-\x7E]/g, "");
-		config.headers!["Content-Type"] = "application/json";
+		if (config.data instanceof FormData) {
+			// FormData detected, set Content-Type to 'multipart/form-data'
+			config.headers!["Content-Type"] = "multipart/form-data";
+		} else {
+			// Default to JSON for other requests
+			config.headers!["Content-Type"] = "application/json";
+		}
+
 		if (authUser) {
 			config.headers!["Authorization"] = `Bearer ${authUser?.accessToken}`;
 		}
